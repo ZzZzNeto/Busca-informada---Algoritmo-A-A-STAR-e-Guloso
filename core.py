@@ -1,5 +1,6 @@
 from Stack import Stacks
 import os, time
+from tkinter import *
 
 class Player:
     def __init__(self, initialPosition):
@@ -138,7 +139,7 @@ class Board:
         
         return self.next_step(lowerStep, steps)
 
-    def resolve(self):
+    def resolve(self, maze):
         steps = self.next_step(self.start)
         
         if not steps.isEmpty(): 
@@ -150,13 +151,8 @@ class Board:
                     currentStep.type = "S"
                     os.system("cls")
                     self.view_board()
-                    print({currentStep.positionX, currentStep.positionY})
+                    maze.move_player(currentStep.positionX, currentStep.positionY)
                     time.sleep(1) 
                     currentStep.type = "-"
-                
-
-b = Board()
-b.create_using_file()
-b.view_board()
-b.resolve()
-print(b.next_step(b.start))
+                    
+            
