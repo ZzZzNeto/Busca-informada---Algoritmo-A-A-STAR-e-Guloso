@@ -77,7 +77,7 @@ class Board:
     def calculate_variables(self):
         for line in self.places:
             for place in line: 
-                if place.type == "0":
+                if place.type == "0" or place.type == "#":
                     #calculate G
                     if place.positionX != self.start.positionX and place.positionY != self.start.positionY:
                         #diagonal
@@ -93,28 +93,34 @@ class Board:
 
                     #calulate F
                     place.F = place.G + place.H
-
-    def next_step(self, place, steps = Stacks(100)):
+    
+    def get_adjacents(self, place):
         adjacents = []
         for line in self.places:
             for char in line: 
                 if char.positionX >= place.positionX - 1 and char.positionX <= place.positionX + 1 and char.positionY >= place.positionY - 1 and char.positionY <= place.positionY + 1 and char.type != 'S' and char.type != '-':
                     adjacents.append(char)
+        return adjacents
+
+    def next_step(self, place, steps = Stacks(100)):
+        adjacents = self.get_adjacents(place)
         
-        # Identifica próximo passo. Por padrão, o valor é posição que fica no top_left.
+        # Identifica próximo passo. Por padrão, o valor é posição que fica no top_left. 
         lowerStep = None
+        lowerStep2 = None # 👍
         for adjacent in adjacents:
             if adjacent.valid and not adjacent.type == '1':
                 if lowerStep:
                     if adjacent.F < lowerStep.F:
                         lowerStep = adjacent
                 else:
-                    lowerStep = adjacent        
+                    lowerStep = adjacent
+        
         # print('próxima etapa', {lowerStep.positionX, lowerStep.positionY})
         # Se não houver nenhum passo, o local dele não muda, então deve desempilhar
         if not lowerStep and steps.getRowLength() > 0:
             place.valid = False
-            removedStep = steps.unStack()
+            steps.unStack()
             print('entrou quando:', {place.positionX, place.positionY})
             place.type = "0"
             if steps.getTop():
@@ -131,9 +137,22 @@ class Board:
             for step in steps.getValues():
                 if step:
                     step.type = "0"
-            return steps
+            node = steps.getTop()
+            right_path = []
+
+            start_adjacentes = self.get_adjacents(self.start)
+            while node not in start_adjacentes: 
+                node_adjacents = self.get_adjacents(node)
+                minior = node_adjacents[0]
+                for x in node_adjacents:
+                    if x.H < minior.H and x.H != 0:
+                        print(x.H, minior.H)
+                        minior = x
+                
+                right_path.append(node)
+                node = minior
+            return right_path
         
-        # steps.append({lowerStep.positionX, lowerStep.positionY})
         place.type = "-"
         lowerStep.type = "S"
         

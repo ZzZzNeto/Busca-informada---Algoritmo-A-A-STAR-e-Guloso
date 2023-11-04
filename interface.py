@@ -16,6 +16,7 @@ class Maze:
             'row': None,
         }
 
+        self.count = 0
         self.rows = rows
         self.columns = columns
         self.maze = [["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
@@ -29,12 +30,11 @@ class Maze:
                      ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
                      ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
                      ]
-        self.count = 0
         self.buttons = [[None for _ in range(columns)] for _ in range(rows)]
 
         self.step_button = Button(
             self.master, text="Crie suas barreiras.", command=self.next_color_step)
-        self.step_button.grid(row=rows + 1, columnspan=columns)
+        self.step_button.grid(row=rows + 1, columnspan=columns, sticky="nsew")
 
         self.text_area = Text(self.master, height=2)
         self.text_area.grid(row=rows, columnspan=columns, sticky="nsew")
