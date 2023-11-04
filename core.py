@@ -4,7 +4,9 @@ from tkinter import *
 
 class Player:
     def __init__(self, initialPosition):
-        self.currentPosition = initialPosition
+        self.current_position = initialPosition
+        self.initialPosition = initialPosition
+        self.accumulator = 0
         
         self.top = None
         self.bottom = None
@@ -15,15 +17,20 @@ class Player:
         self.bottom_left = None
         self.bottom_right = None
     
-    def on_change_position(self, top, bottom, right, left, top_left, top_right, bottom_left):
-        self.top = top
-        self.bottom = bottom
-        self.right = right
-        self.left = left
-        self.top_left = top_left
-        self.top_right = top_right
-        self.bottom_left = bottom_left
-        self.bottom_right = None
+    def on_change_position(self, new_position):
+        self.current_position = new_position
+
+        x, y = new_position.positionX, new_position.positionY
+        currentX, currentY = self.current_position.positionX, self.current_position.positionY
+
+        if currentX != x and currentY != y:
+            # Andou para as diagonais
+            self.accumulator += 14
+        else:
+            # Andou para horizontal ou vertical
+            self.accumulator += 10
+
+        print('NOVO G', self.accumulator)
 
 class Place:
     #types: 0 = Caminho, 1 = Parede, S = Inicio, # = Fim, P = Player
@@ -44,11 +51,12 @@ class Board:
         self.places = []
         self.start = None
         self.end = None
+        self.player = None
 
     def view_board(self):
         for line in self.places:
             for char in line:
-                print(char.type, end=",")
+                print(char.H, end=",")
             print("\n")
 
     def create_using_interface(self):
@@ -67,6 +75,7 @@ class Board:
 
                         if char == "S":
                             self.start = place
+                            self.player = Player(place)
                         elif char == "#":
                             self.end = place
 
@@ -78,14 +87,15 @@ class Board:
         for line in self.places:
             for place in line: 
                 if place.type == "0" or place.type == "#":
+                    print(place)
                     #calculate G
                     if place.positionX != self.start.positionX and place.positionY != self.start.positionY:
                         #diagonal
                         place.G = 14
                     else:
                         #vertical
-                        place.G = 10
-
+                        place.G = 10 
+                    
                     #calculate H
                     dx = abs(place.positionX - self.end.positionX)
                     dy = abs(place.positionY - self.end.positionY)
@@ -100,6 +110,7 @@ class Board:
             for char in line: 
                 if char.positionX >= place.positionX - 1 and char.positionX <= place.positionX + 1 and char.positionY >= place.positionY - 1 and char.positionY <= place.positionY + 1 and char.type != 'S' and char.type != '-':
                     adjacents.append(char)
+        
         return adjacents
 
     def next_step(self, place, steps = Stacks(100)):
@@ -107,7 +118,7 @@ class Board:
         
         # Identifica próximo passo. Por padrão, o valor é posição que fica no top_left. 
         lowerStep = None
-        lowerStep2 = None # 👍
+        
         for adjacent in adjacents:
             if adjacent.valid and not adjacent.type == '1':
                 if lowerStep:
@@ -133,28 +144,32 @@ class Board:
         
         steps.stackUp(lowerStep)
 
-        if not lowerStep or lowerStep.type == '#':
-            for step in steps.getValues():
-                if step:
-                    step.type = "0"
-            node = steps.getTop()
-            right_path = []
-
-            start_adjacentes = self.get_adjacents(self.start)
-            while node not in start_adjacentes: 
-                node_adjacents = self.get_adjacents(node)
-                minior = node_adjacents[0]
-                for x in node_adjacents:
-                    if x.H < minior.H and x.H != 0:
-                        print(x.H, minior.H)
-                        minior = x
+        # if not lowerStep or lowerStep.type == '#':
+        #     for step in steps.getValues():
+        #         if step:
+        #             step.type = "0"
+        #     node = steps.getTop()
+        #     right_path = []
+            
+        #     start_adjacentes = self.get_adjacents(self.start)
+        #     while node not in start_adjacentes: 
+        #         node_adjacents = self.get_adjacents(node)
+        #         minior = node_adjacents[0]
+        #         for x in node_adjacents:
+        #             if x.F < minior.F and x.F != 0:
+        #                 print(x.F, minior.F)
+        #                 minior = x
                 
-                right_path.append(node)
-                node = minior
-            return right_path
+        #         right_path.append(node)
+        #         node = minior
+
+            
+        #     return right_path
         
         place.type = "-"
         lowerStep.type = "S"
+        self.player.on_change_position(place)
+        place.G = self.player.current_position.G
         
         return self.next_step(lowerStep, steps)
 
@@ -174,4 +189,7 @@ class Board:
                     time.sleep(1) 
                     currentStep.type = "-"
                     
-            
+b = Board()
+b.create_using_file()
+b.view_board()
+b.resolve(b.places)
