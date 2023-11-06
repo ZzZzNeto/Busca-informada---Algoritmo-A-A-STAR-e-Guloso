@@ -6,12 +6,11 @@ class Place:
     def __init__(self, type, positionX, positionY, F = 0, G = None, H = 0, C = None):
         self.type = type
         self.F = F
-        self.G = G
-        self.H = H
         self.C = C
         self.positionX = positionX
         self.positionY = positionY
         self.visited = False
+        self.penultimate = None
 
     def __str__(self):
         return self.type
@@ -157,10 +156,10 @@ class Board:
             # steps.append(lowerStep)
 
             return steps
+        self.penultimate = lowerStep
         
         place.type = "-"
         lowerStep.type = "S"
-        
         steps.append(lowerStep)
 
         # if lowerStep.type == '#':
@@ -205,10 +204,34 @@ class Board:
             
             os.system("cls")
             self.show_board()
-            time.sleep(1) 
+            time.sleep(1)
+            
+        self.penultimate.type = "*"
+            
+        os.system("cls")
+        self.show_board()
+        time.sleep(1)
     
 b = Board()
 b.create_board_using_file()
 b.calculate_distance(b.start)
 b.define_best_way()
 b.resolve()
+
+#  ⠄⠄⠄⠄⠄⣿⣿⣿⣿⡇⠃⠒⢪⣿⠉⠒⢾⣿⣧⢸⣿⣿⣿⠇⠄ 
+# ⠄⠄⠄⢀⣷⢻⣿⣿⣿⣷⢰⣶⣾⣿⣶⣶⣾⣿⡿⣸⣿⣿⡟⠄⠄ 
+# ⢠⠁⣰⣿⣿⢸⣿⣿⣿⣿⠘⢯⣍⣉⣩⢟⡽⢣⣾⣿⣿⣿⠃⠄⠄ 
+# ⠘⢛⣽⣿⣿⠄⣿⣿⣿⣿⡌⢦⢙⣛⢱⣿⡧⣿⣿⣿⡿⠁⠄⠄⠄ 
+# ⢠⣾⣿⣿⣿⠄⢻⣿⣿⣿⡇⢰⣿⣿⣬⣭⣅⠊⢻⡇⢰⣿⡆⠄⠄ 
+# ⢿⣿⣿⣿⣿⠄⢸⣿⠟⢛⡄⢸⣿⣿⣦⡁⢿⣷⣮⡃⠟⢿⣿⡀⠄ 
+# ⢀⣿⣿⣿⣿⡇⠘⢣⣾⠟⠄⠸⣿⣿⣿⣿⣦⢹⣿⣿⣦⡑⠈⠁⠄ 
+# ⢸⣿⣿⣿⣿⡇⢠⠟⠁⠾⡏⠄⠘⠻⣿⣿⣿⢸⣿⣿⣿⠿⠟⠛⡄ 
+# ⠘⣿⣿⣿⣿⣿⠈⠄⣄⡀⠄⠂⢲⡦⡈⢻⡿⢸⣿⠿⣫⣴⠶⠶⣻ 
+# ⠄⠈⠛⠿⢿⣿⣧⣠⢝⠓⠄⠠⢅⡠⠤⠒⡐⠲⢶⣤⣤⣤⣤⠔⠁ 
+# ⠄⠄⠄⢀⣀⠇⠙⠊⠉⢸⣿⣿⣿⣿⣿⣿⣿⣿⣶⠖⠄⠄⠄⠄⠄ 
+# ⠄⠄⠄⠄⠄⠄⠄⢀⣠⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠄⠄⠄⠄⠄⠄ 
+# ⠄⠄⠄⠄⠄⣠⠸⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣷⠄⠄⠄⠄⠄⠄ 
+# ⠄⠄⢠⣴⣿⣿⣷⣦⡙⣿⣿⣿⣿⣿⣿⣼⣿⣿⣿⣷⣄⠄⠄⠄⠄ 
+# ⠄⣴⣿⣿⣿⣿⣿⣶⣭⡀⠻⣿⣿⣿⣿⣿⣿⣿⠟⣭⣶⣷⣄⠄⠄
+#  ⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡌⠙⠛⠛⠛⢋⣵⣿⣿⣿⣿⣿⣷⠄
+#  ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⠛⣛⣴⣿⣿⣿⣿⣿⣿⣿⣿⣷
