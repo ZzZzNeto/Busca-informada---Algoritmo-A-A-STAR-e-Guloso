@@ -1,5 +1,5 @@
 from tkinter import *
-from core import Board
+from main import Board
 import time
 class Maze:
     def __init__(self, master, rows, columns):
@@ -137,7 +137,6 @@ class Maze:
 
         self.create_file()
         
-       
 
     def create_file(self):
         with open("template.txt", "w") as file:
@@ -154,9 +153,11 @@ class Maze:
         
     def resolve_maze(self):
         b = Board()
-        b.create_using_file()
-        b.view_board()
-        b.resolve(self)
+        b.create_board_using_file()
+        b.calculate_distance(b.start)
+        b.define_best_way()
+        b.resolve()
+    
     def move_player(self, row, col):
         
         buttonNewPlace = self.buttons[col][row]
@@ -181,22 +182,6 @@ root = Tk()
 maze = Maze(root, 10, 10)
 maze.run_interface()
 root.mainloop()
-
-#  ⠁⠁⠁⠁⠁⠁⠁⢀⣴⣶⣿⣿⣷⣶⣦⡀⠁⠁⠁⠁⠁⠁⠁⠁⠁⠁⠁⠁ 
-# ⠁⠁⠁⠁⠁⠁⠁⣠⣿⣿⣿⣿⣿⣿⣟⣿⣿⣧⣄⠁⠁⠁⠁⠁⠁⠁⠁⠁⠁ 
-# ⠁⠁⠁⠁⣠⣴⣾⣿⣿⣿⣿⣿⣿⣷⣿⣷⣿⣿⣿⣷⣦⣄⡀⠁⠁⠁⠁⠁⠁ 
-# ⢀⣠⠶⠿⠿⠛⠛⠛⠛⠛⠛⠉⠋⠉⠋⠙⠙⠋⠛⠛⠟⠿⠿⣷⣦⡀⠁⠁⠁ 
-# ⠘⠤⡁⡐⢀⠁⠁⡀⠂⢀⠁⢀⠁⠂⠁⡀⢀⠁⡀⢀⠁⠁⠁⠁⢉⡹⠁⠁⠁ 
-# ⠁⠁⠁⠁⠁⠄⣦⣾⡼⠁⣤⢄⠤⠠⠠⠄⢠⠁⡄⢠⢀⡢⠦⠁⠁⡀⠁⠁⠁ 
-# ⠁⠁⠁⠁⠁⠘⠥⡄⣀⠓⢍⢡⢃⡜⢰⠨⠦⠊⠈⠁⠁⢀⢀⠁⡌⢸⡇⠁⠁ 
-# ⠁⠁⠁⠁⠁⠁⠁⠁⠁⠉⠈⣠⣕⢀⢆⢑⡑⢤⣢⡀⠆⢐⠁⠁⢂⠜⠳⠶⡄ 
-# ⠁⠁⠁⠁⠁⠁⠁⢀⣀⠤⢾⡟⣫⠝⠖⡡⠃⠂⠠⠙⠲⠤⣀⠁⡁⢀⢂⡐⠃ 
-# ⠁⠁⠁⢀⣠⣴⢶⡏⠈⠁⣺⢞⡏⡝⠬⡠⢂⡘⣐⣤⠁⠁⠉⠢⣄⣀⡀⠁⠁ 
-# ⠁⠁⠁⡛⠁⠁⠁⠁⠁⠁⣿⣮⡧⣽⢶⣵⣿⣾⣧⣿⡦⠂⠁⠁⠠⠁⡎⡩⠁ 
-# ⠁⠁⠁⠈⠁⠁⠁⠁⠁⠁⠁⠘⠳⣻⣾⡿⡽⡧⣟⡝⢷⢖⣶⣄⠁⠁⠁⠁⠁ 
-# ⠁⠁⠁⠁⠁⠁⠁⠁⠁⣀⠁⠁⠁⣹⡿⣿⠟⠁⠁⣤⣿⢺⡆⡟⢧⠁⠁⠁⠁ 
-# ⠁⠁⠁⠁⠁⠁⠖⡛⠻⠛⠿⢟⢿⢻⡻⣯⠁⠁⠈⠛⠘⠁⠃⠑⠁⠁⠁⠁⠁ 
-# ⠁⠁⠁⠁⠁⠁⠁⠁⠁⠈⠁⠁⠁⠁⠁⠈⠁⠁⠁⠁⠁⠁⠁⠁⠁⠁⠁⠁⠁ 
 
 
 

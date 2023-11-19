@@ -52,10 +52,13 @@ class Board:
         with open('template.txt') as txt:
             count_lines = 0
             for line in txt:
+                if line.isspace():
+                    continue
+                
                 self.places.append([])
                 count_rows = 0
                 for char in line:
-                    if char != "\n":
+                    if char != '\n':
                         place = Place(char, count_rows, count_lines)
                         self.places[count_lines].append(place)
 
@@ -79,7 +82,7 @@ class Board:
 
         place.C = C
         place.F = round(square_root + C, 2)
-
+    
     def calculate_distance(self, current_place, accumulator = 1):
 
         x, y = current_place.positionX, current_place.positionY
@@ -110,14 +113,14 @@ class Board:
 
         if not hasChanges:
             return
-        print(24*'-')
+        
         return self.calculate_distance(current_place, accumulator + 1)
     
     def get_adjacents(self, place):
         adjacents = []
         for line in self.places:
             for char in line: 
-                if char.positionX >= place.positionX - 1 and char.positionX <= place.positionX + 1 and char.positionY >= place.positionY - 1 and char.positionY <= place.positionY + 1 and char.type != 'S' and char.type != '-':
+                if char.positionX >= place.positionX - 1 and char.positionX <= place.positionX + 1 and char.positionY >= place.positionY - 1 and char.positionY <= place.positionY + 1 and char.type != '*' and char.type != 'S' and char.type != '-' and char.type != '1':
                     adjacents.append(char)
         
         return adjacents
@@ -149,7 +152,7 @@ class Board:
             # steps.append(lowerStep)
 
             return steps
-        self.penultimate = lowerStep
+        # self.penultimate = lowerStep
         
         place.type = "-"
         lowerStep.type = "S"
@@ -160,26 +163,132 @@ class Board:
     
         return self.get_next_steps(lowerStep, steps)
     
+    def a_star(self):
+
+        open_list = {self.initialPosition}
+        visited = {}
+        cost = []
+        
+        previous = [] 
+        future = []
+        # Enquanto Abertos não for vazio
+        current = self.initialPosition
+        
+        while open_list:
+            #vértice de Abertos que possui menor valor de caminho futuro
+            current_adjacents = self.get_adjacents(current)
+
+            # for i in current_adjacents:
+            #     print(i.type)
+
+            if self.end == current:
+                return future
+                
+            visited[current] = current
+            
+            try:
+                open_list.remove(current)
+            except:
+                pass
+
+            # for x in visited.values():
+            #     print(x.positionX, x.positionY)
+
+            # Para cada vizinho de atual
+            for neighbor in current_adjacents:
+                
+                if neighbor.type == '#':
+                    return future
+                
+                if neighbor not in visited:
+                    # print(neighbor not in visited)
+                    # print(visited) #kung-fu, vc conhece o whatsapp? - não quando eeu estava da 8 serie eu sabia.. os movimentos... ... e o que vc acha q é o whatsapp? : AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                    # print( neighbor.positionX, neighbor.positionY, visited)
+                    # print(f"neighbor: {neighbor.positionX}, {neighbor.positionY}")
+                    if not neighbor in open_list:
+                        open_list.add(neighbor)
+                    
+                    # current_cost = 0 if current not in cost else cost[cost.index(current)].F
+                    current_neighbor_cost = current.F + neighbor.F
+                    # neighbor_cost = cost[cost.index(current)] if neighbor in cost else 99999999
+                
+                    if neighbor.type == '#':
+                        future.append(neighbor)
+                        current = neighbor
+                        return future
+                    
+                    if neighbor.F < current.F or current.F == 0:
+                        previous.append(current)
+                        cost.append(neighbor)
+                        future.append(neighbor)
+                        current = neighbor
+        
+        return 'error'
+    
     def define_best_way(self):
-        steps = self.get_next_steps(self.start)
+        steps = self.a_star()
         steps.reverse()
         
-        lowerStep = None
-        for current_place in steps:
-            if lowerStep and self.initialPosition.positionX == lowerStep.positionX and self.initialPosition.positionY == lowerStep.positionY:
-                self.reset_board(steps)
-                return
+        reversed_way = [steps[0]]
+        adjacents = []
 
-            adjacents = self.get_adjacents_back(lowerStep if lowerStep else current_place)
-            for adjacent in adjacents:
-                if adjacent.type == '-':
-                    if lowerStep:
-                        if adjacent.F < lowerStep.F and adjacent.C < lowerStep.C:
-                            lowerStep = adjacent
-                    else:
-                        lowerStep = adjacent
+        while self.start not in adjacents:
+            minor = None
+            for adjacent in self.get_adjacents_back(reversed_way[len(reversed_way-1)]):
+                if not minor:
+                    minor = adjacent
+                elif adjacent.F < minor.F: 
+                    minor = adjacent
+            reversed_way.append(minor)
+        
+        return reversed_way
+
+
+        # for adjacent in adjacents:
+        #     if a
+        
+        for place in steps:
+            place.type = "-"
             
-            self.rightWay.append(lowerStep)
+        
+
+    # def define_best_way(self):
+    #     steps = self.a_star()
+    #     steps.reverse()
+
+    #     lowerStep = None
+    #     for current_place in steps:
+    #         # if lowerStep and self.initialPosition.positionX == lowerStep.positionX and self.initialPosition.positionY == lowerStep.positionY:
+    #         #     self.reset_board(steps)
+    #         #     return
+
+    #         adjacents = None
+    #         if lowerStep:
+    #             adjacents = self.teste_social(lowerStep)
+    #         else:
+    #             adjacents = self.teste_social(current_place)
+            
+    #         lowerStep = None
+    #         for adjacent in adjacents:
+    #             if adjacent.type == '-' and not adjacent.visited:
+                    
+    #                 if lowerStep:
+    #                     # if lowerStep.positionX == 7 and lowerStep.positionY == 4:
+    #                     #     print('bolsonaro')
+    #                     #     for x in adjacents:
+    #                     #         print(x.positionX, x.positionY)
+    #                     if adjacent.F < lowerStep.F:
+    #                         lowerStep = adjacent
+    #                 else:
+    #                     lowerStep = adjacent
+
+    #         if not lowerStep:
+    #             return
+            
+    #         lowerStep.visited = True
+    #         self.rightWay.append(lowerStep)
+        
+    #     self.reset_board(steps)
 
     def reset_board(self, steps):
         for step in steps:
@@ -188,25 +297,29 @@ class Board:
             elif step.type == 'S':
                 step.type = '0'
     
-
     def resolve(self):
-        reversedList = self.rightWay
-        reversedList.reverse()
+        reversedList = self.a_star()
+        # remove_duplicate = set(reversedList)
+        # steps = list(remove_duplicate)
+        # print(steps)
+        
+        # for x in reversedList:
+        #     print(x.positionX, x.positionY)
+            
         for place in reversedList:
             place.type = "*"
             
             os.system("cls")
             self.show_board()
-            time.sleep(1)
+            time.sleep(.1)
             
-        self.penultimate.type = "*"
-            
-        os.system("cls")
-        self.show_board()
-        time.sleep(1)
     
 b = Board()
 b.create_board_using_file()
 b.calculate_distance(b.start)
-b.define_best_way()
+delicia = b.a_star()
 b.resolve()
+# for x in delicia:
+#     print(x.positionX, x.positionY)
+# b.define_best_way()
+# b.resolve()
