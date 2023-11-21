@@ -116,14 +116,16 @@ class Board:
                                 heapq.heappush(
                                     open_list, (adjacent.F, adjacent))
 
-    def reconstruct_path(self):
+    def reconstruct_path(self, side = False):
         path = []
-        current = self.end
+        current = side or self.end
 
         while current:
             path.append(current)
-            current = current.father
-
+            father = current.father
+            current.father = None
+            current = father
+        
         path.reverse()
         return path
 
