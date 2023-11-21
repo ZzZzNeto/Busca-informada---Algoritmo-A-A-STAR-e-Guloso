@@ -49,17 +49,29 @@ class Board_WP(Board):
         closed_list = set()
         current = start
 
+        register = []
         while open_list:
             f, competitor = heapq.heappop(open_list)
 
             if competitor and competitor.type != '1':
+                register.append(competitor)
                 closed_list.add((competitor.F, competitor))
                 current = competitor
 
+                if register.count(current) >= 3:
+                    if run:
+                        self.start.father = current
+                    else:
+                        self.end.father = current    
+                    break
+                
                 if current == goal:
                     break
-
+                
+                bigger = None
                 for adjacent in self.get_adjacents(current):
+                    if not bigger:
+                        bigger = adjacent
 
                     if (adjacent.F, adjacent) not in closed_list and adjacent.type != "1":
                         tentative_g = current.G + \
@@ -68,13 +80,17 @@ class Board_WP(Board):
                         if (adjacent.F, adjacent) not in open_list or tentative_g < adjacent.G and not run or tentative_g > adjacent.G and run:
                             adjacent.father = current
                             adjacent.G = tentative_g
+                            if bigger.G < adjacent.G:
+                                bigger = adjacent
                             adjacent.H = self.calculate_distance_manhattan(
                                 adjacent, goal)
                             adjacent.F = adjacent.G + adjacent.H
 
-                            if (adjacent.F, adjacent) not in open_list:
+                            if (adjacent.F, adjacent) not in open_list and not run:
                                 heapq.heappush(
                                     open_list, (adjacent.F, adjacent))
+                if (bigger.F, bigger) not in open_list and run:
+                    heapq.heappush(open_list, (bigger.F, bigger))
 
     def resolve_WP(self, moviment_wolf = 1, moviment_prey = 1):
         while True:
@@ -82,7 +98,7 @@ class Board_WP(Board):
             if adjacents_wolf == ":)":
                 print("PEGO")
                 break
-            # os.system('cls')
+            os.system('cls')
             
             for index in range(moviment_prey):
                 self.a_star_WP(start=self.end, goal=self.start, run=moviment_prey)
@@ -95,9 +111,9 @@ class Board_WP(Board):
             for index in range(moviment_wolf):
                 self.a_star_WP(start=self.start, goal=self.end)
                 move = self.reconstruct_path()[1]
-                
+
                 self.start.type = "0" 
-                self.start = move  
+                self.start = move 
                 self.start.type = "W" 
 
             self.show_board()
