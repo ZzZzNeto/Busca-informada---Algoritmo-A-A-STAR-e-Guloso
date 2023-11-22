@@ -18,6 +18,7 @@ class Maze:
         }
 
         self.count = 0
+        self.exit_count = 0
         self.rows = rows
         self.columns = columns
         self.maze = [["0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
@@ -150,7 +151,6 @@ class Maze:
             row=self.rows + 1, columnspan=self.columns, sticky="nsew")
     
     def resolve_maze(self):
-        
         b = Board_WP()
         b.create_for_WP()
         paths = b.resolve_WP()
@@ -175,6 +175,7 @@ class Maze:
             'column': col,
             'row': row,
         }
+
         buttonNewPlace.configure(background="blue")
         buttonOldPlace.configure(background="SystemButtonFace")
         
@@ -183,9 +184,9 @@ class Maze:
 
     def move_prey(self, row, col):
         buttonNewPlace = self.buttons[col][row]
-        if self.count == 0:
+        if self.exit_count == 0:
             buttonOldPlace = self.buttons[self.exit_coords['row']][self.exit_coords['column']]
-            self.count+=1
+            self.exit_count += 1
         else:
             buttonOldPlace = self.buttons[self.exit_coords['column']][self.exit_coords['row']]
         
