@@ -58,11 +58,9 @@ class Board_WP(Board):
                 closed_list.add((competitor.F, competitor))
                 current = competitor
 
-                if register.count(current) >= 3:
-                    if run:
-                        self.start.father = current
-                    else:
-                        self.end.father = current    
+                if register.count(current) >= 3 and run:
+                    goal.father = current
+                    current.father = register[len(register)-4]
                     break
                 
                 if current == goal:
@@ -80,11 +78,11 @@ class Board_WP(Board):
                         if (adjacent.F, adjacent) not in open_list or tentative_g < adjacent.G and not run or tentative_g > adjacent.G and run:
                             adjacent.father = current
                             adjacent.G = tentative_g
-                            if bigger.G < adjacent.G:
-                                bigger = adjacent
                             adjacent.H = self.calculate_distance_manhattan(
                                 adjacent, goal)
                             adjacent.F = adjacent.G + adjacent.H
+                            if bigger.F < adjacent.F:
+                                bigger = adjacent
 
                             if (adjacent.F, adjacent) not in open_list and not run:
                                 heapq.heappush(
@@ -92,13 +90,12 @@ class Board_WP(Board):
                 if (bigger.F, bigger) not in open_list and run:
                     heapq.heappush(open_list, (bigger.F, bigger))
 
-    def resolve_WP(self, moviment_wolf = 1, moviment_prey = 1):
+    def resolve_WP(self, moviment_wolf = 1, moviment_prey = 2):
         while True:
             adjacents_wolf = self.multiple_adjacents(self.start)
             if adjacents_wolf == ":)":
                 print("PEGO")
                 break
-            os.system('cls')
             
             for index in range(moviment_prey):
                 self.a_star_WP(start=self.end, goal=self.start, run=moviment_prey)
@@ -107,6 +104,10 @@ class Board_WP(Board):
                 self.end.type = "0"
                 self.end = move  
                 self.end.type = "P" 
+                
+                os.system('cls')
+                self.show_board()
+                time.sleep(1)
             
             for index in range(moviment_wolf):
                 self.a_star_WP(start=self.start, goal=self.end)
@@ -116,8 +117,10 @@ class Board_WP(Board):
                 self.start = move 
                 self.start.type = "W" 
 
-            self.show_board()
-            time.sleep(1)
+                os.system('cls')
+                self.show_board()
+                time.sleep(1)
+
 
 b = Board_WP()
 b.create_for_WP()

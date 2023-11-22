@@ -121,11 +121,14 @@ class Board:
         current = side or self.end
 
         while current:
+            if current:
+                print(current.positionX, current.positionY)
             path.append(current)
             father = current.father
             current.father = None
             current = father
-        
+        if side: 
+            print("presa")
         path.reverse()
         return path
 
