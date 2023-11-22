@@ -131,11 +131,3 @@ class Board:
             print("presa")
         path.reverse()
         return path
-
-
-b = Board()
-b.create_board_using_file()
-b.a_star()
-a = b.reconstruct_path()
-for i in a:
-    print(i.positionX, i.positionY, i.type)

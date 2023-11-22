@@ -1,6 +1,7 @@
 from main import Place, Board
 import time, os
 import heapq
+from copy import copy
 
 class Board_WP(Board):
     def show_board(self):
@@ -90,12 +91,12 @@ class Board_WP(Board):
                 if (bigger.F, bigger) not in open_list and run:
                     heapq.heappush(open_list, (bigger.F, bigger))
 
-    def resolve_WP(self, moviment_wolf = 1, moviment_prey = 2):
+    def resolve_WP(self, moviment_wolf = 2, moviment_prey = 1):
+        paths = []
         while True:
             adjacents_wolf = self.multiple_adjacents(self.start)
             if adjacents_wolf == ":)":
-                print("PEGO")
-                break
+                return paths
             
             for index in range(moviment_prey):
                 self.a_star_WP(start=self.end, goal=self.start, run=moviment_prey)
@@ -105,9 +106,7 @@ class Board_WP(Board):
                 self.end = move  
                 self.end.type = "P" 
                 
-                os.system('cls')
-                self.show_board()
-                time.sleep(1)
+                paths.append(copy(self.end))
             
             for index in range(moviment_wolf):
                 self.a_star_WP(start=self.start, goal=self.end)
@@ -117,11 +116,6 @@ class Board_WP(Board):
                 self.start = move 
                 self.start.type = "W" 
 
-                os.system('cls')
-                self.show_board()
-                time.sleep(1)
+                paths.append(copy(self.start))
 
 
-b = Board_WP()
-b.create_for_WP()
-b.resolve_WP()

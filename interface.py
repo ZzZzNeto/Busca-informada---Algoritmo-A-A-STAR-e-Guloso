@@ -1,5 +1,6 @@
 from tkinter import *
 from main import Board
+from wolf_and_prey import Board_WP
 import time
 class Maze:
     def __init__(self, master, rows, columns):
@@ -57,6 +58,7 @@ class Maze:
 
         for i in range(self.rows):
             self.master.grid_rowconfigure(i, weight=1)
+        
         for i in range(self.columns):
             self.master.grid_columnconfigure(i, weight=1)
 
@@ -69,8 +71,7 @@ class Maze:
                 'row': row,
             }
         elif self.current_color_step == 1 and self.player_coords['column']:
-            button1 = self.buttons[self.player_coords['row']
-                                   ][self.player_coords['column']]
+            button1 = self.buttons[self.player_coords['row']][self.player_coords['column']]
             button1.configure(background="SystemButtonFace")
 
             self.player_coords = {
@@ -131,15 +132,13 @@ class Maze:
                 if (current_color == 'red'):
                     self.maze[row][col] = "1"
                 elif (current_color == 'green'):
-                    self.maze[row][col] = "#"
+                    self.maze[row][col] = "P"
                 elif (current_color == 'blue'):
-                    self.maze[row][col] = "S"
-
+                    self.maze[row][col] = "W"
         self.create_file()
         
-
     def create_file(self):
-        with open("template.txt", "w") as file:
+        with open("template_WP.txt", "w") as file:
             for line in self.maze:
                 for char in line:
                     file.write(char)
@@ -150,23 +149,27 @@ class Maze:
         self.step_button.grid(
             row=self.rows + 1, columnspan=self.columns, sticky="nsew")
     
-        
     def resolve_maze(self):
-        b = Board()
-        b.create_board_using_file()
-        b.calculate_distance(b.start)
-        b.define_best_way()
-        b.resolve()
-    
-    def move_player(self, row, col):
         
+        b = Board_WP()
+        b.create_for_WP()
+        paths = b.resolve_WP()
+        
+        print(paths)
+        # return
+        for path in paths:
+            if path.type == 'W':
+                self.move_wolf(path.positionX, path.positionY)
+            elif path.type == 'P':
+                self.move_prey(path.positionX, path.positionY)
+    
+    def move_wolf(self, row, col):
         buttonNewPlace = self.buttons[col][row]
         if self.count == 0:
             buttonOldPlace = self.buttons[self.player_coords['row']][self.player_coords['column']]
-            self.count+=1
+            self.count += 1
         else:
             buttonOldPlace = self.buttons[self.player_coords['column']][self.player_coords['row']]
-
         
         self.player_coords = {
             'column': col,
@@ -176,7 +179,26 @@ class Maze:
         buttonOldPlace.configure(background="SystemButtonFace")
         
         self.master.update()        
-        time.sleep(0.2)
+        time.sleep(0.5)
+
+    def move_prey(self, row, col):
+        buttonNewPlace = self.buttons[col][row]
+        if self.count == 0:
+            buttonOldPlace = self.buttons[self.exit_coords['row']][self.exit_coords['column']]
+            self.count+=1
+        else:
+            buttonOldPlace = self.buttons[self.exit_coords['column']][self.exit_coords['row']]
+        
+        self.exit_coords = {
+            'column': col,
+            'row': row,
+        }
+
+        buttonNewPlace.configure(background="green")
+        buttonOldPlace.configure(background="SystemButtonFace")
+        
+        self.master.update()        
+        time.sleep(0.5)
         
 root = Tk()
 maze = Maze(root, 10, 10)
